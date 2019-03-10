@@ -1,0 +1,246 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerController : MonoBehaviour
+{
+
+    public float speed;
+    public float jumpForce;
+    public Text countText;
+    public Text winText;
+    public Text scoreText;
+
+    private Rigidbody2D rb2d;
+    private int count;
+    private int score;
+
+    void Start()
+    {
+        rb2d = GetComponent<Rigidbody2D>();
+        count = 0;
+        score = 3;
+        SetCountText();
+        SetScoreText();
+        DestroyComponent();
+        winText.text = "";
+    }
+
+    void FixedUpdate()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        Vector2 movement = new Vector2(moveHorizontal, 0);
+
+        rb2d.AddForce(movement * speed);
+
+        {
+            if (Input.GetKey("escape"))
+                Application.Quit();
+        }
+
+        if (count == 4)
+        {
+            SceneManager.LoadScene("Level2");
+        }
+    }
+
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.collider.tag == "Ground")
+        {
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                rb2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+            }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        //Check the provided Collider2D parameter other to see if it is tagged "PickUp", if it is...
+        if (other.gameObject.CompareTag("Meme"))
+        {
+            //... then set the other object we just collided with to inactive.
+            other.gameObject.SetActive(false);
+
+            //Add one to the current value of our count variable.
+            count = count + 1;
+
+            //Update the currently displayed count by calling the SetCountText function.
+            SetCountText();
+        }
+
+
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            other.gameObject.SetActive(false);
+            score = score - 1;
+            SetScoreText();
+
+        }
+    }
+    void SetCountText()
+    {
+        countText.text = "Count: " + count.ToString();
+        if (count >= 8)
+        {
+            winText.text = "You Win!";
+        }
+    }
+
+    void SetScoreText()
+    {
+        scoreText.text = "Lives: " + score.ToString();
+        if (score == 0)
+        {
+            winText.text = "You lose!";
+            DestroyComponent();
+        }
+    }
+
+    void DestroyComponent()
+    {
+        if (score == 0)
+        {
+            Destroy(GetComponent<Rigidbody2D>());
+        }
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerControllerLevel2 : MonoBehaviour
+{
+    public float speed;
+    public float jumpForce;
+    public Text countText;
+    public Text winText;
+    public Text scoreText;
+
+    private Rigidbody2D rb2d;
+    private int count;
+    private int score;
+
+    void Start()
+    {
+        rb2d = GetComponent<Rigidbody2D>();
+        count = 0;
+        score = 3;
+        SetCountText();
+        SetScoreText();
+        DestroyComponent();
+        winText.text = "";
+    }
+
+    void FixedUpdate()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        Vector2 movement = new Vector2(moveHorizontal, 0);
+
+        rb2d.AddForce(movement * speed);
+    }
+
+        void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.collider.tag == "Ground")
+        {
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                rb2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
+            }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        //Check the provided Collider2D parameter other to see if it is tagged "PickUp", if it is...
+        if (other.gameObject.CompareTag("Meme"))
+        {
+            //... then set the other object we just collided with to inactive.
+            other.gameObject.SetActive(false);
+
+            //Add one to the current value of our count variable.
+            count = count + 1;
+
+            //Update the currently displayed count by calling the SetCountText function.
+            SetCountText();
+        }
+
+
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            other.gameObject.SetActive(false);
+            score = score - 1;
+            SetScoreText();
+
+        }
+    }
+    void SetCountText()
+    {
+        countText.text = "Count: " + count.ToString();
+        if (count >= 4)
+        {
+            winText.text = "You Win!";
+        }
+    }
+
+    void SetScoreText()
+    {
+        scoreText.text = "Lives: " + score.ToString();
+        if (score == 0)
+        {
+            winText.text = "You lose!";
+            DestroyComponent();
+        }
+    }
+
+    void DestroyComponent()
+    {
+        if (score == 0)
+        {
+            Destroy(GetComponent<Rigidbody2D>());
+        }
+    }
+}
+using UnityEngine;
+using System.Collections;
+
+public class CompleteRotator : MonoBehaviour {
+
+	//Update is called every frame
+	void Update () 
+	{
+		//Rotate thet transform of the game object this is attached to by 45 degrees, taking into account the time elapsed since last frame.
+		transform.Rotate (new Vector3 (0, 0, 45) * Time.deltaTime);
+	}
+}
+using UnityEngine;
+using System.Collections;
+
+public class CompleteCameraController : MonoBehaviour {
+
+	public GameObject player;		//Public variable to store a reference to the player game object
+
+
+	private Vector3 offset;			//Private variable to store the offset distance between the player and camera
+
+	// Use this for initialization
+	void Start () 
+	{
+		//Calculate and store the offset value by getting the distance between the player's position and camera's position.
+		offset = transform.position - player.transform.position;
+	}
+	
+	// LateUpdate is called after Update each frame
+	void LateUpdate () 
+	{
+		// Set the position of the camera's transform to be the same as the player's, but offset by the calculated offset distance.
+		transform.position = player.transform.position + offset;
+	}
+}
+
+
